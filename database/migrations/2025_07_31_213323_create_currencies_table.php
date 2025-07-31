@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code', 3);
             $table->string('symbol', 10);
-            $table->string('name', 50);
+            $table->string('name', 10);
             $table->decimal("rate", 15, 4)->default(0);
             $table->timestamps();
         });

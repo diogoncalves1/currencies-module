@@ -2,40 +2,93 @@
 
 namespace App\Repositories;
 
+use App\Enums\Language;
 use App\Models\Currency;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CurrencyRepository implements RepositoryInterface
 {
     public function all()
     {
-        Currency::all();
+        return Currency::all();
     }
 
     public function store(Request $request)
     {
         try {
+            return DB::transaction(function () use ($request) {
+                $input = $request->only(['code', 'symbol']);
+
+                $languages = Language::cases();
+
+                foreach ($languages as $language) {
+                    $info[$language->name] = $request->get($language->name);
+                }
+
+                $input["info"] = json_encode($info);
+                // Here use API
+                $input["rate"] = 0.5;
+
+                $currency = Currency::store($input);
+
+                Log::info('Currency ' . $currency->id . ' successfully created');
+                return response()->json(['success' => true, 'message' => 'Moeda adicionada com sucesso']);
+            });
         } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['error' => true, 'message' => 'Erro ao tentar adicionar uma nova moeda'], 500);
         }
     }
 
     public function update(Request $request, string $id)
     {
         try {
+            return DB::transaction(function () use ($request, $id) {
+                $currency = $this->show($id);
+
+                $input = $request->only(['code', 'symbol']);
+
+                $languages = Language::cases();
+
+                foreach ($languages as $language) {
+                    $info[$language->name] = $request->get($language->name);
+                }
+
+                $input["info"] = json_encode($info);
+
+                $currency->update($input);
+
+                Log::info('Currency ' . $currency->id . ' successfully updated');
+                return response()->json(['success' => true, 'message' => 'Moeda atualizada com sucesso']);
+            });
         } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['error' => true, 'message' => 'Erro ao tentar atualizar moeda'], 500);
         }
     }
 
     public function destroy(string $id)
     {
         try {
+            return DB::transaction(function () use ($id) {
+                $currency = $this->show($id);
+
+                $currency->delete();
+
+                Log::info('Currency ' . $currency->id . ' successfully deleted');
+                return response()->json(['error' => true, 'message' => 'Moeda apagada com sucesso']);
+            });
         } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['error' => true, 'message' => 'Erro ao tentar apagar moeda'], 500);
         }
     }
 
     public function show(string $id)
     {
-        Currency::find($id);
+        return Currency::find($id);
     }
 
     public function dataTable(Request $request)

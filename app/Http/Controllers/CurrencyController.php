@@ -27,6 +27,7 @@ class CurrencyController extends Controller
     public function create()
     {
         // $this->allowedAction('getCurrencies');
+
         Session::flash('page', 'currencies');
 
         $languages = Language::cases();
@@ -42,6 +43,7 @@ class CurrencyController extends Controller
     public function edit(string $id)
     {
         // $this->allowedAction('getCurrencies');
+
         Session::flash('page', 'currencies');
 
         $currency = $this->currencyRepository->show($id);

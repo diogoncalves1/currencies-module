@@ -23,9 +23,8 @@ class CurrencyRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name' => 'required|string|max:50',
+            'info' => 'required|string|max:50',
             'symbol' => 'required|string|max:50',
-            'rate' => 'nullable|numeric|min:0'
         ];
 
         if ($this->get('currency_id'))

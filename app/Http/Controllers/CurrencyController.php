@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Language;
 use App\Repositories\CurrencyRepository;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
 class CurrencyController extends Controller
 {
-    private CurrencyRepository $repository;
+    private CurrencyRepository $currencyRepository;
 
-    public function __construct(CurrencyRepository $repository)
+    public function __construct(CurrencyRepository $currencyRepository)
     {
-        $this->repository = $repository;
+        $this->currencyRepository = $currencyRepository;
     }
 
     public function index()
@@ -27,30 +27,24 @@ class CurrencyController extends Controller
     public function create()
     {
         // $this->allowedAction('getCurrencies');
+
+        $languages = Language::cases();
+
+        return view('admin.currencies.form', compact('languages'));
     }
 
-    public function store(Request $request)
-    {
-        // $this->allowedAction('getCurrencies');
-    }
-
-    public function show(string $id)
-    {
-        // $this->allowedAction('getCurrencies');
-    }
+    // public function show(string $id)
+    // {
+    //     // $this->allowedAction('getCurrencies');
+    // }
 
     public function edit(string $id)
     {
         // $this->allowedAction('getCurrencies');
-    }
 
-    public function update(Request $request, string $id)
-    {
-        // $this->allowedAction('getCurrencies');
-    }
+        $currency = $this->currencyRepository->show($id);
+        $languages = Language::cases();
 
-    public function destroy(string $id)
-    {
-        // $this->allowedAction('getCurrencies');
+        return view('admin.currencies.form', compact('currency', 'languages'));
     }
 }

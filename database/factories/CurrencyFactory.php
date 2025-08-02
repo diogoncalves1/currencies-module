@@ -20,22 +20,21 @@ class CurrencyFactory extends Factory
 
 
         $currencies = [
-            'USD' => ['symbol' => '$', 'name' => 'United States Dollar'],
-            'EUR' => ['symbol' => '€', 'name' => 'Euro'],
-            'GBP' => ['symbol' => '£', 'name' => 'British Pound Sterling'],
-            'JPY' => ['symbol' => '¥', 'name' => 'Japanese Yen'],
-            'AUD' => ['symbol' => 'A$', 'name' => 'Australian Dollar'],
-            'CAD' => ['symbol' => 'C$', 'name' => 'Canadian Dollar'],
-            // Add more as needed
+            'USD' => ['symbol' => '$', 'info' => '{"en": {"name": "United States Dollar"}}'],
+            'EUR' => ['symbol' => '€', 'info' => '{"en": {"name": "Euro"}}'],
+            'GBP' => ['symbol' => '£', 'info' => '{"en": {"name": "British Pound Sterling"}}'],
+            'JPY' => ['symbol' => '¥', 'info' => '{"en": {"name": "Japanese Yen"}}'],
+            'AUD' => ['symbol' => 'A$', 'info' => '{"en": {"name": "Australian Dollar"}}'],
+            'CAD' => ['symbol' => 'C$', 'info' => '{"en": {"name": "Canadian Dollar"}}'],
         ];
 
         $symbol = $currencies[$code]['symbol'] ?? '$';
-        $name = $currencies[$code]['name'] ?? 'Unknown Currency';
+        $info = $currencies[$code]['info'] ?? '{"en": {"name": "United States Dollar"}}';
 
         return [
             "code" => $code,
             "symbol" => $symbol,
-            "name" => $name,
+            "info" => $info,
             "rate" => $this->faker->randomFloat(4, 0.1, 5)
         ];
     }

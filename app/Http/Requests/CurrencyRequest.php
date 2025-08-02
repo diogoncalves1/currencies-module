@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Language;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,9 +24,16 @@ class CurrencyRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'info' => 'required|string|max:50',
             'symbol' => 'required|string|max:50',
         ];
+
+
+        $languages = Language::cases();
+
+        foreach ($languages as $language) {
+            $rules[$language->name] = "required|array";
+            $rules[$language->name . '.name'] = "required|string|max:100";
+        }
 
         if ($this->get('currency_id'))
             $rules['code'] = ['required', 'string', Rule::unique('currencies', 'code')->ignore($this->get('currency_id')), 'size:3'];

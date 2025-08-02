@@ -9,4 +9,7 @@ class Currency extends Model
 {
     /** @use HasFactory<\Database\Factories\CurrencyFactory> */
     use HasFactory;
+
+    protected $table = "currencies";
+    protected $fillable = ['code', 'info', 'symbol', 'rate'];
 }

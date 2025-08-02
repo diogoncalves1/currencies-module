@@ -5,21 +5,49 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\AppController;
 use Illuminate\Http\Request;
 use App\Repositories\CurrencyRepository;
+use App\Http\Requests\CurrencyRequest;
 
 class CurrencyController extends AppController
 {
-    private CurrencyRepository $repository;
+    private CurrencyRepository $currencyRepository;
 
-    public function __construct(CurrencyRepository $repository)
+    public function __construct(CurrencyRepository $currencyRepository)
     {
-        $this->repository = $repository;
+        $this->currencyRepository = $currencyRepository;
+    }
+
+    public function store(CurrencyRequest $request)
+    {
+        // $this->allowedAction('getCurrencies');
+
+        $response = $this->currencyRepository->store($request);
+
+        return $response;
+    }
+
+    public function update(CurrencyRequest $request, string $id)
+    {
+        // $this->allowedAction('getCurrencies');
+
+        $response = $this->currencyRepository->update($request, $id);
+
+        return $response;
+    }
+
+    public function destroy(string $id)
+    {
+        // $this->allowedAction('getCurrencies');
+
+        $response = $this->currencyRepository->destroy($id);
+
+        return $response;
     }
 
     public function dataTable(Request $request)
     {
         // $this->allowedAction('getCurrencies');
 
-        $data = $this->repository->dataTable($request);
+        $data = $this->currencyRepository->dataTable($request);
 
         return response()->json($data);
     }

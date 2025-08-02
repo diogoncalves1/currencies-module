@@ -7,7 +7,7 @@ Route::group([
     "prefix" => "admin/",
     "middleware" => "auth"
 ], function () {
-    Route::resource('currencies', \App\Http\Controllers\CurrencyController::class);
+    Route::resource('currencies', \App\Http\Controllers\CurrencyController::class, ['except' => ['store', 'update', 'destroy', /*'show'*/]]);
 });
 
 # Api
@@ -16,5 +16,6 @@ Route::group([
     "prefix" => "api/",
     "middleware" => "auth"
 ], function () {
+    Route::resource('currencies', \App\Http\Controllers\Api\CurrencyController::class, ['except' => ['index', 'create', 'edit']]);
     Route::get('currencies/data', [\App\Http\Controllers\Api\CurrencyController::class, 'dataTable']);
 });

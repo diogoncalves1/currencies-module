@@ -27,7 +27,6 @@ class CurrencyRequest extends FormRequest
             'symbol' => 'required|string|max:50',
         ];
 
-
         $languages = Language::cases();
 
         foreach ($languages as $language) {

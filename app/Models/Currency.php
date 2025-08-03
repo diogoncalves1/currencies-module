@@ -12,4 +12,9 @@ class Currency extends Model
 
     protected $table = "currencies";
     protected $fillable = ['code', 'info', 'symbol', 'rate'];
+
+    public function scopeCode($query, $code)
+    {
+        return $query->where("code", $code);
+    }
 }

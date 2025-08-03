@@ -32,6 +32,7 @@ class CurrencyController extends Controller
 
         $languages = Language::cases();
 
+
         return view('admin.currencies.form', compact('languages'));
     }
 

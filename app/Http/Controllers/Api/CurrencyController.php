@@ -51,4 +51,18 @@ class CurrencyController extends AppController
 
         return response()->json($data);
     }
+
+    public function checkCode(Request $request)
+    {
+        // $this->allowedAction('checkCurrenciesCode');
+
+        $request->validate([
+            "id" => "nullable",
+            "code" => "required|string|size:3",
+        ]);
+
+        $response = $this->currencyRepository->checkCode($request);
+
+        return  $response;
+    }
 }

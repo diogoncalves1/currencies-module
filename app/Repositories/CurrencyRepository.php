@@ -31,7 +31,7 @@ class CurrencyRepository implements RepositoryInterface
                 // Here use API
                 $input["rate"] = 0.5;
 
-                $currency = Currency::store($input);
+                $currency = Currency::create($input);
 
                 Log::info('Currency ' . $currency->id . ' successfully created');
                 return response()->json(['success' => true, 'message' => 'Moeda adicionada com sucesso']);
@@ -94,6 +94,8 @@ class CurrencyRepository implements RepositoryInterface
     public function dataTable(Request $request)
     {
         $query = Currency::query();
+        $userLang = /* $_COOKIE['lang'] ?? */ 'en';
+
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where("name", 'like', "{$search}%")
@@ -111,16 +113,17 @@ class CurrencyRepository implements RepositoryInterface
 
         $total = $query->count();
 
-        $users = $query->offset($request->start)
+        $currencies = $query->offset($request->start)
             ->limit($request->length)
+            ->select("code", "id", "symbol", "info->{$userLang}->name as name")
             ->get();
 
-        foreach ($users as &$user) {
-            $user->actions = "<div class='btn-group'>
-                            <a type='button' href='" . route('admin.currencies.edit', $user->id) . "' class='btn mr-1 btn-default'>
+        foreach ($currencies as &$currency) {
+            $currency->actions = "<div class='btn-group'>
+                            <a type='button' href='" . route('admin.currencies.edit', $currency->id) . "' class='btn mr-1 btn-default'>
                                 <i class='fas fa-edit'></i>
                             </a>
-                            <button type='button' onclick='modalDelete({$user->id})' class='btn btn-default'>
+                            <button type='button' onclick='modalDelete({$currency->id})' class='btn btn-default'>
                                 <i class='fas fa-trash'></i>
                             </button>
                         </div>";
@@ -130,9 +133,21 @@ class CurrencyRepository implements RepositoryInterface
             'draw' => intval($request->draw),
             'recordsTotal' => $total,
             'recordsFiltered' => $total,
-            'data' => $users
+            'data' => $currencies
         ];
 
         return $data;
+    }
+
+    public function checkCode(Request $request)
+    {
+        $query = Currency::code($request->get('code'));
+
+        if ($request->get("id"))
+            $query->where('id', '!=', $request->get('id'));
+
+        $exists =  $query->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 }

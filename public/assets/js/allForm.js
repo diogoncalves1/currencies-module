@@ -1,6 +1,5 @@
+const groups = document.querySelectorAll(".form-group");
 const btnSubmit = document.getElementById("btnSubmit");
-
-let groups = document.querySelectorAll(".form-group");
 
 Array.from(groups).forEach((group) => {
     let input = group.querySelector(".form-control");
@@ -10,87 +9,53 @@ Array.from(groups).forEach((group) => {
     });
 });
 
-btnSubmit.addEventListener("click", async () => {
-    try {
-        groups = document.querySelectorAll(".form-group");
+$(function () {
+    btnSubmit.addEventListener("click", () => {
+        feedbacks(groups);
+    });
 
-        let request = await Promise.all(
-            Array.from(groups).map(async (group) => {
-                let input = group.querySelector(".form-control");
+    $("#form").on("submit", async function (e) {
+        try {
+            feedbacks(groups);
 
-                if (input.classList.contains("validate")) {
-                    let erroFeedback = group.querySelector(".invalid-feedback");
-                    if (!(await isInputValid(input, erroFeedback))) return null;
-                }
+            e.preventDefault();
 
-                let inputDataRole = input.getAttribute("data-role");
+            const url = e.target.action;
+            var method;
 
-                if (inputDataRole == "selectMultiple") {
-                    var inputValue = $(input).val();
-                    inputDataRole = null;
-                } else var inputValue = input.value;
+            method = window.location.pathname.includes("create")
+                ? "POST"
+                : "PUT";
 
-                let inputRole = input.role;
-
-                return {
-                    dataRole: inputDataRole ? inputDataRole : null,
-                    role: inputRole,
-                    value: inputValue ? inputValue : null,
-                };
-            })
-        );
-
-        if (
-            document.querySelector(
-                ".nav-pills .nav-item .nav-link.active .extra"
-            ) != null
-        ) {
-            var extra = document.querySelector(
-                ".nav-pills .nav-item .nav-link.active .extra"
-            );
-            request.push({
-                dataRole: null,
-                role: extra.role,
-                value: extra.getAttribute("data-value"),
+            $.ajax({
+                url: url,
+                method: method,
+                data: $(this).serialize(),
+                success: function (response) {
+                    successToast(response.message);
+                },
+                error: function (error) {
+                    if (error.responseJSON.message)
+                        return errorToast(error.responseJSON.message);
+                    return errorToast("Erro na tentativa.");
+                },
             });
+        } catch (e) {
+            console.log(e);
+            infoToast("Erro");
         }
+    });
 
-        if (request.some((item) => item === null)) throw new Error("Error");
+    function feedbacks(groups) {
+        Array.from(groups).map(async (group) => {
+            let input = group.querySelector(".form-control");
 
-        let ajaxData = {};
+            console.log(input.required);
 
-        request.forEach((data) => {
-            var role = data.role;
-            var value = data.value ? data.value : null;
-            var dataRole = data.dataRole ? data.dataRole : null;
-
-            if (role) {
-                if (!ajaxData[role]) ajaxData[role] = {};
-            }
-
-            if (dataRole && role) {
-                ajaxData[role][dataRole] = value;
-            } else {
-                ajaxData[role] = value;
+            if (input.required) {
+                let erroFeedback = group.querySelector(".invalid-feedback");
+                if (!(await isInputValid(input, erroFeedback))) return null;
             }
         });
-
-        const url = window.location.pathname.replace("/create", "");
-
-        $.ajax({
-            url: url,
-            type: "POST",
-            data: ajaxData,
-            success: function (response) {
-                console.log(response);
-                successToast(response.message);
-            },
-            error: function (error) {
-                console.log(error);
-                errorToast("Erro na tentativa.");
-            },
-        });
-    } catch (e) {
-        infoToast("Preencha os campos corretamente");
     }
 });

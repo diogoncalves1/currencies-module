@@ -4,6 +4,60 @@ $.ajaxSetup({
     },
 });
 
+async function isInputValid(input, errorFeedback) {
+    if (input.value == "" || input.value == null) {
+        input.classList.remove("is-valid");
+        input.classList.add("is-invalid");
+        errorFeedback.innerText = "Preencha este campo";
+        return 0;
+    }
+
+    if (input.type == "email") {
+        if (!checkEmail(input, errorFeedback)) return 0;
+    }
+
+    var inputMinLength = input.getAttribute("minlength");
+    if (inputMinLength) {
+        if (input.value.length < inputMinLength) {
+            errorFeedback.innerText =
+                "O mínimo de caracteres é de " + inputMinLength + ".";
+            input.classList.remove("is-valid");
+            input.classList.add("is-invalid");
+            return 0;
+        }
+    }
+    var inputMaxLength = input.getAttribute("maxlength");
+    if (inputMaxLength) {
+        if (input.value.length > inputMaxLength) {
+            errorFeedback.innerText =
+                "O máximo de caracteres é de " + inputMaxLength + ".";
+            input.classList.remove("is-valid");
+            input.classList.add("is-invalid");
+            return 0;
+        }
+    }
+    var inputMax = input.max;
+    if (inputMax) {
+        if (parseFloat(input.value) > parseFloat(inputMax)) {
+            console.log("aa");
+            errorFeedback.innerText =
+                "O valor é maior que o máximo atribuido: " + inputMax + ".";
+            input.classList.remove("is-valid");
+            input.classList.add("is-invalid");
+            return 0;
+        }
+    }
+
+    var inputExtra = input.getAttribute("data-extra");
+    if (inputExtra && typeof window[inputExtra] === "function") {
+        if (await window[inputExtra](input.value)) return 0;
+    }
+
+    input.classList.remove("is-invalid");
+    input.classList.add("is-valid");
+    return 1;
+}
+
 async function modalAlert(alertTitle, action, id) {
     Swal.fire({
         title: alertTitle,

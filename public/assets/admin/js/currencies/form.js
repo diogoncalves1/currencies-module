@@ -1,4 +1,4 @@
-const inputCode = document.querySelector("[role='code']");
+const inputCode = document.querySelector("[name='code']");
 const errorFeedbackCode = document.getElementById("errorFeedbackCode");
 
 inputCode.addEventListener("input", function () {
@@ -7,12 +7,10 @@ inputCode.addEventListener("input", function () {
 });
 
 async function checkCurrencyCode(code) {
-    var url = "/currencies/check-code";
+    var url = "/api/currencies/check-code";
     var id = window.location.pathname
         .replace("/admin/currencies/", "")
         .replace("/edit", "");
-
-    console.log(id);
 
     var response = await $.ajax({
         url: url,

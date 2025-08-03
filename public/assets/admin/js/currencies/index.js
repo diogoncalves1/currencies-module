@@ -26,15 +26,10 @@ $(function () {
                 data: "name",
             },
             {
-                data: "email",
+                data: "code",
             },
             {
-                data: "roles",
-                render: function (roles) {
-                    return roles.map((role) => {
-                        return " " + role.name;
-                    });
-                },
+                data: "symbol",
             },
             {
                 data: "actions",

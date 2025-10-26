@@ -8,17 +8,18 @@ inputCode.addEventListener("input", function () {
 
 async function checkCurrencyCode(code) {
     var url = "/api/v1/currencies/check-code";
-    var id = window.location.pathname
-        .replace("/admin/currencies/", "")
-        .replace("/edit", "");
+
+    const data = {
+        code: code,
+    };
+
+    if (document.querySelector("#currencyId"))
+        data.id = ocument.querySelector("#currencyId").value;
 
     var response = await $.ajax({
         url: url,
         type: "GET",
-        data: {
-            code: code,
-            id: id ?? null,
-        },
+        data: data,
     });
     if (response.exists) {
         inputCode.classList.remove("is-valid");

@@ -50,8 +50,6 @@ $(function () {
         Array.from(groups).map(async (group) => {
             let input = group.querySelector(".form-control");
 
-            console.log(input.required);
-
             if (input.required) {
                 let erroFeedback = group.querySelector(".invalid-feedback");
                 if (!(await isInputValid(input, erroFeedback))) return null;

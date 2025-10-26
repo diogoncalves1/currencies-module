@@ -7,7 +7,7 @@ inputCode.addEventListener("input", function () {
 });
 
 async function checkCurrencyCode(code) {
-    var url = "/api/currencies/check-code";
+    var url = "/api/v1/currencies/check-code";
     var id = window.location.pathname
         .replace("/admin/currencies/", "")
         .replace("/edit", "");

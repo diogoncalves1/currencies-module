@@ -1,21 +1,20 @@
 <?php
 
-namespace Modules\Currency\Providers;
+namespace Modules\ApiResponder\Providers;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
-class CurrencyServiceProvider extends ServiceProvider
+class ApiResponderServiceProvider extends ServiceProvider
 {
     use PathNamespace;
 
-    protected string $name = 'Currency';
+    protected string $name = 'ApiResponder';
 
-    protected string $nameLower = 'currency';
+    protected string $nameLower = 'apiresponder';
 
     /**
      * Boot the application events.
@@ -35,31 +34,16 @@ class CurrencyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(
-            __DIR__ . '/../Config/services.php',
-            'currency.services'
-        );
-
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
     }
-
-    protected function mapApiRoutes()
-    {
-        Route::prefix('api')
-            ->middleware('api')
-            ->group(module_path('FinancialGoal', '/Routes/api.php'));
-    }
-
 
     /**
      * Register commands in the format of Command::class
      */
     protected function registerCommands(): void
     {
-        $this->commands([
-            \Modules\Currency\Console\Commands\FetchApiCurrenciesDaily::class,
-        ]);
+        // $this->commands([]);
     }
 
     /**
@@ -78,7 +62,7 @@ class CurrencyServiceProvider extends ServiceProvider
      */
     public function registerTranslations(): void
     {
-        $langPath = resource_path('lang/modules/' . $this->nameLower);
+        $langPath = resource_path('lang/modules/'.$this->nameLower);
 
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->nameLower);
@@ -101,9 +85,9 @@ class CurrencyServiceProvider extends ServiceProvider
 
             foreach ($iterator as $file) {
                 if ($file->isFile() && $file->getExtension() === 'php') {
-                    $config = str_replace($configPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
+                    $config = str_replace($configPath.DIRECTORY_SEPARATOR, '', $file->getPathname());
                     $config_key = str_replace([DIRECTORY_SEPARATOR, '.php'], ['.', ''], $config);
-                    $segments = explode('.', $this->nameLower . '.' . $config_key);
+                    $segments = explode('.', $this->nameLower.'.'.$config_key);
 
                     // Remove duplicated adjacent segments
                     $normalized = [];
@@ -138,14 +122,14 @@ class CurrencyServiceProvider extends ServiceProvider
      */
     public function registerViews(): void
     {
-        $viewPath = resource_path('views/modules/' . $this->nameLower);
+        $viewPath = resource_path('views/modules/'.$this->nameLower);
         $sourcePath = module_path($this->name, 'resources/views');
 
-        $this->publishes([$sourcePath => $viewPath], ['views', $this->nameLower . '-module-views']);
+        $this->publishes([$sourcePath => $viewPath], ['views', $this->nameLower.'-module-views']);
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
-        Blade::componentNamespace(config('modules.namespace') . '\\' . $this->name . '\\View\\Components', $this->nameLower);
+        Blade::componentNamespace(config('modules.namespace').'\\' . $this->name . '\\View\\Components', $this->nameLower);
     }
 
     /**
@@ -160,8 +144,8 @@ class CurrencyServiceProvider extends ServiceProvider
     {
         $paths = [];
         foreach (config('view.paths') as $path) {
-            if (is_dir($path . '/modules/' . $this->nameLower)) {
-                $paths[] = $path . '/modules/' . $this->nameLower;
+            if (is_dir($path.'/modules/'.$this->nameLower)) {
+                $paths[] = $path.'/modules/'.$this->nameLower;
             }
         }
 

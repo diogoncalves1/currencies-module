@@ -30,7 +30,7 @@ class CurrencyRepository implements RepositoryInterface
 
             $input["name"] = json_encode($info);
 
-            $apiToken = "fbd30e414a2fcb5b26108b54";
+            $apiToken = config('currency.services.api_token');
             $response = Http::get("https://v6.exchangerate-api.com/v6/$apiToken/latest/USD");
 
             if ($response->successful()) {
@@ -45,7 +45,7 @@ class CurrencyRepository implements RepositoryInterface
             $currency = Currency::create($input);
 
             Log::info('Currency ' . $currency->id . ' successfully created');
-            return response()->json(['success' => true, 'message' => 'Moeda adicionada com sucesso']);
+            return $currency;
         });
     }
 

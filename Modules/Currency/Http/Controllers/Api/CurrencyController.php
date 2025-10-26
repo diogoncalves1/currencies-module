@@ -39,13 +39,38 @@ class CurrencyController extends ApiController
         }
     }
 
+    /**
+     * Show the specified resource.
+     * @param string $id
+     * @return JsonResponse
+     */
+    public function show(string $id): JsonResponse
+    {
+        try {
+            $currency = $this->repository->show($id);
+
+            return $this->ok(new CurrencyResource($currency));
+        } catch (\Exception $e) {
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     * @param CurrencyRequest $request
+     * @param string $id
+     * @return JsonResponse
+     */
     public function update(CurrencyRequest $request, string $id)
     {
-        $this->allowedAction('editCurrency');
+        try {
+            $this->allowedAction('editCurrency');
 
-        $response = $this->repository->update($request, $id);
+            $currency = $this->repository->update($request, $id);
 
-        return $response;
+            return $this->ok(new CurrencyResource($currency), "");
+        } catch (\Exception $e) {
+        }
     }
 
     public function destroy(string $id)

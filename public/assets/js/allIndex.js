@@ -8,7 +8,7 @@ function tryDelete(url) {
         type: "DELETE",
         success: function (response) {
             successToast(response.message);
-            $("#table").DataTable().ajax.reload();
+            $("#data-table").DataTable().ajax.reload();
         },
         error: function (error) {
             if (error.status == 403) {

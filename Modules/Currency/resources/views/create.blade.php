@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin | ' . (isset($currency) ? 'Editar' : 'Adicionar') . ' Moeda ')
+@section('title', 'Currency Module | ' . (isset($currency) ? 'Editar' : 'Adicionar') . ' Moeda ')
 
 @section('breadcrumb')
 <li class="breadcrumb-item"><a class="text-white" href="{{ route('admin.currencies.index') }}">Moedas</a></li>

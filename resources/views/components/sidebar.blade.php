@@ -1,7 +1,7 @@
 <aside class="main-sidebar elevation-4 sidebar-dark-primary">
 
     <a href="{{ route('admin.currencies.index') }}" class="brand-link bg-primary bg-indigo bg-dark bg-gray-dark">
-        <span class="brand-text font-weight-light">Permissions</span>
+        <span class="brand-text font-weight-light">Currency Module</span>
     </a>
 
     <div
@@ -47,17 +47,15 @@
                     <nav class="mt-2">
                         <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview"
                             role="menu" data-accordion="false">
-                            {{-- @can('authorization', 'viewCurrencies') --}}
                             <li class="nav-item">
                                 <a href="{{ route('admin.currencies.index') }}"
-                                    class="nav-link {{ session('page') == 'currencies' ? 'active' : '' }}">
+                                    class="nav-link {!!  Illuminate\Support\Str::contains(\Request::route()->getName(), 'currencies') ? 'active' : '' !!}">
                                     <i class="nav-icon fas fa-coins"></i>
                                     <p>
-                                        Moedas
+                                        Currencies
                                     </p>
                                 </a>
                             </li>
-                            {{-- @endcan  --}}
                         </ul>
                     </nav>
                 </div>

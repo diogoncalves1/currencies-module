@@ -48,7 +48,7 @@ class CurrencyServiceProvider extends ServiceProvider
     {
         Route::prefix('api')
             ->middleware('api')
-            ->group(module_path('FinancialGoal', '/Routes/api.php'));
+            ->group(module_path('Currency', '/Routes/api.php'));
     }
 
 

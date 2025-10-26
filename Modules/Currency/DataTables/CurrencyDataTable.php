@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Product\DataTables;
+namespace Modules\Currency\DataTables;
 
 use Illuminate\Support\Facades\Auth;
 use Modules\Currency\Entities\Currency;
@@ -41,7 +41,7 @@ class CurrencyDataTable extends DataTable
                     $btn .= '<a title=\'Remover\'
                 data-toggle="tooltip" data-placement="top"
                 class="btn btn-times btn-default mr-1"
-                onclick="modalDelete(' . route('api.currencies.destroy', $currency->id) . ')">
+                onclick="modalDelete(`' . route('api.currencies.destroy', $currency->id) . '`)">
                     <span class="m-l-5"><i class="fa fa-trash"></i></span></a>';
                 }
 
@@ -73,18 +73,13 @@ class CurrencyDataTable extends DataTable
     public function html()
     {
         return $this->builder()
-            ->setTableId('products-table')
+            ->setTableId('data-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->postAjax()
             ->language('/vendor/datatables-portuguese.json')
             ->orderBy(1, 'asc')
-            ->dom('Blfrtip')
-            // ->parameters([
-            //     "lengthMenu" => [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
-
-            //     'buttons' => ['pageLength', 'excel'],
-            // ])
+            ->dom('Bfrtip')
             ->drawCallback(" function () {
                     $('[data-toggle=\"tooltip\"]').tooltip();
                 }   

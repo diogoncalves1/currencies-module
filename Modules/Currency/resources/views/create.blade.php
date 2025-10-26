@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin | ' . (isset($currency) ? 'Editar' : 'Adicionar') . ' Moeda ')
+@section('title', 'Currency Module | ' . (isset($currency) ? 'Editar' : 'Adicionar') . ' Moeda ')
 
 @section('breadcrumb')
 <li class="breadcrumb-item"><a class="text-white" href="{{ route('admin.currencies.index') }}">Moedas</a></li>
@@ -14,7 +14,7 @@
         @csrf
 
         @if(isset($currency))
-        <input type="hidden" name="currency_id" value="{{ $currency->id ?? null }}">
+        <input type="hidden" id="currencyId" name="currency_id" value="{{ $currency->id ?? null }}">
         @endif
         <div class="row">
             <div class="col-12">
@@ -72,8 +72,8 @@
                                 <div class="form-group">
                                     <label for="inputDisplayName">Nome em {{ strtoupper($language) }} <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" name="{{ $language }}[name]" placeholder="Nome em {{ strtoupper($language) }}..."
-                                        value="{{ isset($currency) ? (json_decode($currency->name)->{$language}) ?? '' : '' }}"
+                                    <input type="text" name="{{ $language }}" placeholder="Nome em {{ strtoupper($language) }}..."
+                                        value="{{ isset($currency) ? $currency->name->{$language} ?? '' : '' }}"
                                         class="form-control" required>
                                     <span class="error invalid-feedback">Preencha este
                                         campo</span>

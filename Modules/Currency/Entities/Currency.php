@@ -12,8 +12,8 @@ class Currency extends Model
 
     protected $table = "currencies";
     protected $fillable = ['code', 'name', 'symbol', 'rate'];
-    protected $attributes = [
-        'name' => '{"en":"AED"}'
+    protected $casts = [
+        'name' => 'object'
     ];
 
     protected static function newFactory()

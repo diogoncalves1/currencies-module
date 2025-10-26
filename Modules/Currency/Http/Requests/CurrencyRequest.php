@@ -29,8 +29,7 @@ class CurrencyRequest extends FormRequest
         $languages = config('languages');
 
         foreach ($languages as $language) {
-            $rules[$language] = "required|array";
-            $rules[$language . '.name'] = "required|string|max:191";
+            $rules[$language] = "required|string|max:191";
         }
 
         if ($this->get('currency_id'))

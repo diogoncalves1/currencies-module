@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Repositories\RepositoryInterface;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Http;
 
 class CurrencyRepository implements RepositoryInterface
@@ -25,12 +24,12 @@ class CurrencyRepository implements RepositoryInterface
             $languages = config('languages');
 
             foreach ($languages as $language) {
-                $info[$language] = $request->get($language);
+                $name[$language] = $request->get($language);
             }
 
-            $input["name"] = json_encode($info);
+            $input["name"] = (object) $name;
 
-            $apiToken = config('currency.services.api_token');
+            $apiToken = config('currency.services.external.api_key');
             $response = Http::get("https://v6.exchangerate-api.com/v6/$apiToken/latest/USD");
 
             if ($response->successful()) {
@@ -51,46 +50,38 @@ class CurrencyRepository implements RepositoryInterface
 
     public function update(Request $request, string $id)
     {
-        try {
-            return DB::transaction(function () use ($request, $id) {
-                $currency = $this->show($id);
 
-                $input = $request->only(['code', 'symbol']);
+        return DB::transaction(function () use ($request, $id) {
+            $currency = $this->show($id);
 
-                $languages = config('languages');
+            $input = $request->only(['code', 'symbol']);
 
-                foreach ($languages as $language) {
-                    $info[$language] = $request->get($language);
-                }
+            $languages = config('languages');
 
-                $input["name"] = json_encode($info);
+            foreach ($languages as $language) {
+                $info[$language] = $request->get($language);
+            }
 
-                $currency->update($input);
+            $input["name"] = json_encode($info);
 
-                Log::info('Currency ' . $currency->id . ' successfully updated');
-                return response()->json(['success' => true, 'message' => 'Moeda atualizada com sucesso']);
-            });
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['error' => true, 'message' => 'Erro ao tentar atualizar moeda'], 500);
-        }
+            $currency->update($input);
+
+            Log::info('Currency ' . $currency->id . ' successfully updated.');
+            return $currency;
+        });
     }
 
     public function destroy(string $id)
     {
-        try {
-            return DB::transaction(function () use ($id) {
-                $currency = $this->show($id);
 
-                $currency->delete();
+        return DB::transaction(function () use ($id) {
+            $currency = $this->show($id);
 
-                Log::info('Currency ' . $currency->id . ' successfully deleted');
-                return response()->json(['error' => true, 'message' => 'Moeda apagada com sucesso']);
-            });
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['error' => true, 'message' => 'Erro ao tentar apagar moeda'], 500);
-        }
+            $currency->delete();
+
+            Log::info('Currency ' . $currency->id . ' successfully deleted.');
+            return $currency;
+        });
     }
 
     public function show(string $id)
@@ -105,56 +96,6 @@ class CurrencyRepository implements RepositoryInterface
         if ($request->get("id"))
             $query->where('id', '!=', $request->get('id'));
 
-        $exists =  $query->exists();
-
-        return response()->json(['exists' => $exists]);
-    }
-
-    public function dataTable(Request $request)
-    {
-        $query = Currency::query();
-        $userLang = /* Cookie::get('lang') ?? */ 'en';
-
-        if ($search = $request->input('search.value')) {
-            $query->where(function ($q) use ($search) {
-                $q->where("name", 'like', "{$search}%")
-                    ->orWhere("code", 'like', "{$search}%")
-                    ->orWhere("symbol", 'like', "{$search}%");
-            });
-        }
-
-        $orderColumnIndex = $request->input('order.0.column');
-        $orderColumn = $request->input("columns.$orderColumnIndex.data");
-        $orderDir = $request->input('order.0.dir');
-        if ($orderColumn && $orderDir) {
-            $query->orderBy($orderColumn, $orderDir);
-        }
-
-        $total = $query->count();
-
-        $currencies = $query->offset($request->start)
-            ->limit($request->length)
-            ->select("code", "id", "symbol", "rate", "name->{$userLang} as name")
-            ->get();
-
-        foreach ($currencies as &$currency) {
-            $currency->actions = "<div class='btn-group'>
-                            <a type='button' href='" . route('admin.currencies.edit', $currency->id) . "' class='btn mr-1 btn-default'>
-                                <i class='fas fa-edit'></i>
-                            </a>
-                            <button type='button' onclick='modalDelete(`" .  route('api.currencies.destroy', $currency->id) . "`)' class='btn btn-default'>
-                                <i class='fas fa-trash'></i>
-                            </button>
-                        </div>";
-        }
-
-        $data = [
-            'draw' => intval($request->draw),
-            'recordsTotal' => $total,
-            'recordsFiltered' => $total,
-            'data' => $currencies
-        ];
-
-        return $data;
+        return $query->exists();
     }
 }

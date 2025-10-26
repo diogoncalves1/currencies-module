@@ -7,8 +7,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
+use Modules\Currency\Http\Requests\CheckCurrencyCodeRequest;
 use Modules\Currency\Repositories\CurrencyRepository;
 use Modules\Currency\Http\Requests\CurrencyRequest;
+use Modules\Currency\Http\Resources\CurrencyCollection;
 use Modules\Currency\Http\Resources\CurrencyResource;
 
 class CurrencyController extends ApiController
@@ -18,6 +20,16 @@ class CurrencyController extends ApiController
     public function __construct(CurrencyRepository $currencyRepository)
     {
         $this->repository = $currencyRepository;
+    }
+
+    /**
+     * Display a listing of the resource.
+     * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
+    public function index()
+    {
+        return $this->ok(new CurrencyCollection($this->repository->all()));
     }
 
     /**
@@ -32,7 +44,7 @@ class CurrencyController extends ApiController
 
             $currency = $this->repository->store($request);
 
-            return $this->ok(new CurrencyResource($currency), "Moeda adicionada com sucesso");
+            return $this->ok(new CurrencyResource($currency), "Moeda adicionada com sucesso!");
         } catch (\Exception $e) {
             Log::error($e);
             return $this->fail('Erro ao tentar adicionar uma nova moeda', $e, $e->getCode());
@@ -51,7 +63,8 @@ class CurrencyController extends ApiController
 
             return $this->ok(new CurrencyResource($currency));
         } catch (\Exception $e) {
-            return $this->fail($e->getMessage(), $e, $e->getCode());
+            Log::error($e);
+            return $this->fail('Erro ao tentar buscar moeda.', $e->getMessage(), $e, $e->getCode());
         }
     }
 
@@ -61,59 +74,73 @@ class CurrencyController extends ApiController
      * @param string $id
      * @return JsonResponse
      */
-    public function update(CurrencyRequest $request, string $id)
+    public function update(CurrencyRequest $request, string $id): JsonResponse
     {
         try {
             $this->allowedAction('editCurrency');
 
             $currency = $this->repository->update($request, $id);
 
-            return $this->ok(new CurrencyResource($currency), "");
+            return $this->ok(new CurrencyResource($currency), "Moeda atualizada com sucesso!");
         } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail('Erro ao tentar atualizar moeda.', $e, $e->getCode());
         }
     }
 
-    public function destroy(string $id)
+    /**
+     * Remove the specified resource from storage.
+     * @param string $id
+     * @return JsonResponse
+     */
+    public function destroy(string $id): JsonResponse
     {
-        $this->allowedAction('destroyCurrency');
+        try {
+            $this->allowedAction('destroyCurrency');
 
-        $response = $this->repository->destroy($id);
+            $currency = $this->repository->destroy($id);
 
-        return $response;
+            return $this->ok(new CurrencyResource($currency), 'Moeda apagada com sucesso!');
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail('Erro ao tentar atualizar moeda.', $e, $e->getCode());
+        }
     }
 
-    public function checkCode(Request $request)
+    /**
+     * Check the specified resource.
+     * @param CheckCurrencyCodeRequest $request
+     * @return JsonResponse
+     */
+    public function checkCode(CheckCurrencyCodeRequest $request): JsonResponse
     {
-        $this->allowedAction('viewCurrency');
+        try {
+            $this->allowedAction('viewCurrency');
 
-        $request->validate([
-            "id" => "nullable",
-            "code" => "required|string|size:3",
-        ]);
+            $exists = $this->repository->checkCode($request);
 
-        $response = $this->repository->checkCode($request);
-
-        return  $response;
+            return $this->ok(additionals: ['exists' => $exists]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail('Erro ao tentar verificar código da moeda.', $e, $e->getCode());
+        }
     }
 
-    public function updateRates()
+    /**
+     * Update the specified resource in storage.
+     * @return JsonResponse
+     */
+    public function updateRates(): JsonResponse
     {
-        $this->allowedAction('updateRates');
+        try {
+            $this->allowedAction('updateRates');
 
-        Artisan::call('currency:fetch-daily');
+            Artisan::call('currency:fetch-daily');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Taxas atualizadas com sucesso',
-        ]);
-    }
-
-    public function dataTable(Request $request)
-    {
-        // $this->allowedAction('viewCurrency');
-
-        $data = $this->repository->dataTable($request);
-
-        return response()->json($data);
+            return $this->ok(message: 'Taxas atualizadas com sucesso');
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail('Erro ao tentar atualizar taxas das moedas.', $e, $e->getCode());
+        }
     }
 }

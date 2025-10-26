@@ -47,6 +47,7 @@
                     <nav class="mt-2">
                         <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview"
                             role="menu" data-accordion="false">
+                            @can('authorization', 'viewCurrency')
                             <li class="nav-item">
                                 <a href="{{ route('admin.currencies.index') }}"
                                     class="nav-link {!!  Illuminate\Support\Str::contains(\Request::route()->getName(), 'currencies') ? 'active' : '' !!}">
@@ -56,6 +57,7 @@
                                     </p>
                                 </a>
                             </li>
+                            @endcan
                         </ul>
                     </nav>
                 </div>

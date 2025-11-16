@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Currency')
+@section('title', 'Currency Module')
 
 @section('css')
 <link rel="stylesheet" href="/admin-lte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">

@@ -1,4 +1,7 @@
 {
+    "ApiResponder": true,
     "Currency": true,
-    "Permission": true
+    "Language": true,
+    "Permission": true,
+    "User": true
 }
